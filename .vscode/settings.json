@@ -2,6 +2,7 @@
     "files.associations": {
         "lvgl.h": "c",
         "lv_demo_widgets.h": "c",
-        "lv_demo_benchmark.h": "c"
+        "lv_demo_benchmark.h": "c",
+        "lv_mem.h": "c"
     }
 }
