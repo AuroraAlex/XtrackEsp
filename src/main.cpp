@@ -9,6 +9,8 @@
 
 #include "demos/lv_demos.h"
 
+#define TOUTCH_PIN 8
+
 /*Change to your screen resolution*/
 static const uint16_t screenWidth = 240;
 static const uint16_t screenHeight = 240;
@@ -69,6 +71,15 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
 //     }
 // }
 
+void TouchCallBack(void)
+{
+    if (touchInterruptGetLastStatus(TOUTCH_PIN))
+    {
+        Serial.println("touch");
+    }
+    
+}
+
 void setup()
 {
     Serial.begin(9600); /* prepare for possible serial debug */
@@ -126,18 +137,23 @@ void setup()
 
     // uncomment one of these demos
     lv_demo_widgets(); // OK
-    // lv_demo_benchmark();          // OK
-    // lv_demo_keypad_encoder();     // works, but I haven't an encoder
-    // lv_demo_music();              // NOK
-    // lv_demo_printer();
-    // lv_demo_stress();             // seems to be OK
+                       // lv_demo_benchmark();          // OK
+                       // lv_demo_keypad_encoder();     // works, but I haven't an encoder
+                       // lv_demo_music();              // NOK
+                       // lv_demo_printer();
+                       // lv_demo_stress();             // seems to be OK
 #endif
+touch_value_t touch_value = 29000U; 
+touchAttachInterrupt(TOUTCH_PIN,TouchCallBack,touch_value);
     Serial.println("Setup done");
 }
 
 void loop()
 {
+    
     lv_timer_handler(); /* let the GUI do its work */
     lv_tick_inc(1);
+    // touch_value = touchRead(TOUTCH_PIN);
+    
     delay(1);
 }
