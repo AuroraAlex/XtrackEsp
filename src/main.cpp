@@ -7,14 +7,14 @@
 #include <lv_examples.h>
 */
 
-#include "../lvgl/src/demos/lv_demos.h"
+#include "demos/lv_demos.h"
 
 /*Change to your screen resolution*/
 static const uint16_t screenWidth = 240;
-static const uint16_t screenHeight = 320;
+static const uint16_t screenHeight = 240;
 
 static lv_disp_draw_buf_t draw_buf;
-static lv_color_t buf[screenWidth * 100];
+static lv_color_t buf[screenWidth * screenHeight];
 
 TFT_eSPI tft = TFT_eSPI(screenWidth, screenHeight); /* TFT instance */
 #if LV_USE_LOG != 0
@@ -41,33 +41,33 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
 }
 
 // /*Read the touchpad*/
-void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
-{
-    uint16_t touchX, touchY;
+// void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
+// {
+//     uint16_t touchX, touchY;
 
-    bool touched = tft.getTouch(&touchX, &touchY, 600);
+//     bool touched = tft.getTouch(&touchX, &touchY, 600);
 
-    if (!touched)
-    {
-        data->state = LV_INDEV_STATE_REL;
-    }
-    else
-    {
-        data->state = LV_INDEV_STATE_PR;
+//     if (!touched)
+//     {
+//         data->state = LV_INDEV_STATE_REL;
+//     }
+//     else
+//     {
+//         data->state = LV_INDEV_STATE_PR;
 
-        /*Set the coordinates*/
-        // data->point.x = touchX;
-        // data->point.y = touchY;
-        data->point.x = touchY;
-        data->point.y = touchX;
+//         /*Set the coordinates*/
+//         // data->point.x = touchX;
+//         // data->point.y = touchY;
+//         data->point.x = 240 - touchY;
+//         data->point.y = touchX;
 
-        Serial.print("Data x ");
-        Serial.println(touchX);
+//         Serial.print("Data x ");
+//         Serial.println(touchX);
 
-        Serial.print("Data y ");
-        Serial.println(touchY);
-    }
-}
+//         Serial.print("Data y ");
+//         Serial.println(touchY);
+//     }
+// }
 
 void setup()
 {
@@ -86,15 +86,15 @@ void setup()
 #endif
 
     tft.begin();        /* TFT init */
-    tft.setRotation(2); /* Landscape orientation, flipped */
+    tft.setRotation(3); /* Landscape orientation, flipped */
 
     /*Set the touchscreen calibration data,
      the actual data for your display can be acquired using
      the Generic -> Touch_calibrate example from the TFT_eSPI library*/
-    uint16_t calData[5] = {275, 3620, 264, 3532, 1};
-    tft.setTouch(calData);
+    // uint16_t calData[5] = {275, 3620, 264, 3532, 1};
+    // tft.setTouch(calData);
 
-    lv_disp_draw_buf_init(&draw_buf, buf, NULL, screenWidth * 10);
+    lv_disp_draw_buf_init(&draw_buf, buf, NULL, screenWidth * screenHeight);
 
     /*Initialize the display*/
     static lv_disp_drv_t disp_drv;
@@ -107,11 +107,11 @@ void setup()
     lv_disp_drv_register(&disp_drv);
 
     /*Initialize the (dummy) input device driver*/
-    static lv_indev_drv_t indev_drv;
-    lv_indev_drv_init(&indev_drv);
-    indev_drv.type = LV_INDEV_TYPE_POINTER;
-    indev_drv.read_cb = my_touchpad_read;
-    lv_indev_drv_register(&indev_drv);
+    // static lv_indev_drv_t indev_drv;
+    // lv_indev_drv_init(&indev_drv);
+    // indev_drv.type = LV_INDEV_TYPE_POINTER;
+    // indev_drv.read_cb = my_touchpad_read;
+    // lv_indev_drv_register(&indev_drv);
 
 #if 0
     /* Create simple label */
