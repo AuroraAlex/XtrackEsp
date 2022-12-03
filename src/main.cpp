@@ -1,15 +1,6 @@
-#include "lvgl.h"
-#include <TFT_eSPI.h>
-#include <Arduino.h>
-/*If you want to use the LVGL examples,
-  make sure to install the lv_examples Arduino library
-  and uncomment the following line.
-#include <lv_examples.h>
-*/
+#include "comm.h"
+#include "bsp_touch_pin_button.h"
 
-#include "demos/lv_demos.h"
-
-#define TOUTCH_PIN 8
 
 /*Change to your screen resolution*/
 static const uint16_t screenWidth = 240;
@@ -42,7 +33,7 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
     lv_disp_flush_ready(disp);
 }
 
-// /*Read the touchpad*/
+/*Read the touchpad*/
 // void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
 // {
 //     uint16_t touchX, touchY;
@@ -71,14 +62,7 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
 //     }
 // }
 
-void TouchCallBack(void)
-{
-    if (touchInterruptGetLastStatus(TOUTCH_PIN))
-    {
-        Serial.println("touch");
-    }
-    
-}
+
 
 void setup()
 {
@@ -117,12 +101,8 @@ void setup()
     disp_drv.draw_buf = &draw_buf;
     lv_disp_drv_register(&disp_drv);
 
-    /*Initialize the (dummy) input device driver*/
-    // static lv_indev_drv_t indev_drv;
-    // lv_indev_drv_init(&indev_drv);
-    // indev_drv.type = LV_INDEV_TYPE_POINTER;
-    // indev_drv.read_cb = my_touchpad_read;
-    // lv_indev_drv_register(&indev_drv);
+    TouchPinInit();
+
 
 #if 0
     /* Create simple label */
@@ -143,8 +123,7 @@ void setup()
                        // lv_demo_printer();
                        // lv_demo_stress();             // seems to be OK
 #endif
-touch_value_t touch_value = 29000U; 
-touchAttachInterrupt(TOUTCH_PIN,TouchCallBack,touch_value);
+
     Serial.println("Setup done");
 }
 
