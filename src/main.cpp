@@ -1,13 +1,13 @@
 #include "comm.h"
 #include "bsp_touch_pin_button.h"
 
-
 /*Change to your screen resolution*/
 static const uint16_t screenWidth = 240;
 static const uint16_t screenHeight = 240;
 
 static lv_disp_draw_buf_t draw_buf;
 static lv_color_t buf[screenWidth * screenHeight];
+// static mutex_t lvgl_mutex;
 
 TFT_eSPI tft = TFT_eSPI(screenWidth, screenHeight); /* TFT instance */
 #if LV_USE_LOG != 0
@@ -32,6 +32,20 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
 
     lv_disp_flush_ready(disp);
 }
+
+/// 定时检测任务
+void lv_timer_handler_task(void *pt)
+{
+    (void)pt;
+    while (1)
+    {
+        lv_tick_inc(1);
+        lv_task_handler();
+        touch_value = touchRead(TOUTCH_PIN);
+        // vTaskDelay(pdMS_TO_TICKS(1));
+    }
+}
+
 
 /*Read the touchpad*/
 // void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
@@ -61,8 +75,6 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
 //         Serial.println(touchY);
 //     }
 // }
-
-
 
 void setup()
 {
@@ -103,7 +115,6 @@ void setup()
 
     TouchPinInit();
 
-
 #if 0
     /* Create simple label */
     lv_obj_t *label = lv_label_create( lv_scr_act() );
@@ -125,14 +136,19 @@ void setup()
 #endif
 
     Serial.println("Setup done");
+    disableCore0WDT();
+    int res = xTaskCreate(lv_timer_handler_task, "lv_timer_handler_task", 4096, NULL, 1, NULL);
+    //串口打印res变量的值
+    Serial.println(res);
+    
 }
+
 
 void loop()
 {
-    
-    lv_timer_handler(); /* let the GUI do its work */
-    lv_tick_inc(1);
+    // lv_timer_handler(); /* let the GUI do its work */
+    // lv_tick_inc(1);
     // touch_value = touchRead(TOUTCH_PIN);
-    
-    delay(1);
+
+    // delay(1);
 }
