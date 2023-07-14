@@ -1,13 +1,15 @@
 #include "comm.h"
 #include "bsp_touch_pin_button.h"
 
+#define MUTEX
 /*Change to your screen resolution*/
 static const uint16_t screenWidth = 240;
 static const uint16_t screenHeight = 240;
 
 static lv_disp_draw_buf_t draw_buf;
 static lv_color_t buf[screenWidth * screenHeight];
-// static mutex_t lvgl_mutex;
+//互斥锁
+static SemaphoreHandle_t lvgl_mutex;
 
 TFT_eSPI tft = TFT_eSPI(screenWidth, screenHeight); /* TFT instance */
 #if LV_USE_LOG != 0
@@ -38,11 +40,14 @@ void lv_timer_handler_task(void *pt)
 {
     (void)pt;
     while (1)
-    {
+    {  
+        #ifdef MUTEX
+        xSemaphoreTake(lvgl_mutex,portMAX_DELAY);
         lv_tick_inc(1);
         lv_task_handler();
-        touch_value = touchRead(TOUTCH_PIN);
-        // vTaskDelay(pdMS_TO_TICKS(1));
+        xSemaphoreGive(lvgl_mutex);
+        vTaskDelay(pdMS_TO_TICKS(1));
+        #endif
     }
 }
 
@@ -85,6 +90,10 @@ void setup()
 
     Serial.println(LVGL_Arduino);
     Serial.println("I am LVGL_Arduino");
+
+    //初始化lvgl互斥锁
+    lvgl_mutex = xSemaphoreCreateMutex();
+
 
     lv_init();
 

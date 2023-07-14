@@ -63,6 +63,7 @@ void button_read(lv_indev_drv_t *drv, lv_indev_data_t *data)
     {
 
         data->state = LV_INDEV_STATE_RELEASED; /*Set the released state*/
+        last_y =60;
     }
     data->point.x = last_x;
     data->point.y = last_y;
