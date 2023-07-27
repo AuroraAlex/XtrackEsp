@@ -1,4 +1,5 @@
 #include "comm.h"
+#include "bsp_timer.h"
 #include "bsp_touch_pin_button.h"
 
 #define MUTEX
@@ -20,6 +21,22 @@ void my_print(const char *buf)
     Serial.flush();
 }
 #endif
+
+
+void timer_test_log(void)
+{
+    static uint8_t count = 0U;
+    Serial.println("timer_test_log");
+    if (10U == count)
+    {
+        BSP_Timer_Stop();
+    }
+    else
+    {
+        count++;
+    }
+    
+}
 
 /* Display flushing */
 void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p)
@@ -51,35 +68,6 @@ void lv_timer_handler_task(void *pt)
     }
 }
 
-
-/*Read the touchpad*/
-// void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
-// {
-//     uint16_t touchX, touchY;
-
-//     bool touched = tft.getTouch(&touchX, &touchY, 600);
-
-//     if (!touched)
-//     {
-//         data->state = LV_INDEV_STATE_REL;
-//     }
-//     else
-//     {
-//         data->state = LV_INDEV_STATE_PR;
-
-//         /*Set the coordinates*/
-//         // data->point.x = touchX;
-//         // data->point.y = touchY;
-//         data->point.x = 240 - touchY;
-//         data->point.y = touchX;
-
-//         Serial.print("Data x ");
-//         Serial.println(touchX);
-
-//         Serial.print("Data y ");
-//         Serial.println(touchY);
-//     }
-// }
 
 void setup()
 {
@@ -145,10 +133,18 @@ void setup()
 #endif
 
     Serial.println("Setup done");
+    //关闭看门狗
     disableCore0WDT();
-    int res = xTaskCreate(lv_timer_handler_task, "lv_timer_handler_task", 4096, NULL, 1, NULL);
-    //串口打印res变量的值
-    Serial.println(res);
+    //创建定时器
+    BSP_TimerInit();
+    // BSP_Timer_SetTimeMs(500U);
+    BSP_Timer_StartOneShot(5000U);
+    BSP_Timer_RegisterCallBack(timer_test_log);
+    BSP_Timer_Start();
+
+    //创建LVGL任务
+    xTaskCreate(lv_timer_handler_task, "lv_timer_handler_task", 4096, NULL, 1, NULL);
+
     
 }
 

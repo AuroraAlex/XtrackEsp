@@ -52,7 +52,7 @@ void button_read(lv_indev_drv_t *drv, lv_indev_data_t *data)
         last_btn = btn_pr;                    /*Save the ID of the pressed button*/
         data->state = LV_INDEV_STATE_PRESSED; /*Set the pressed state*/
         Serial.println("touch");
-        last_key = LV_KEY_END;
+        last_key = LV_KEY_DOWN;
         last_y -= 10;
         if (0 == last_y)
         {
